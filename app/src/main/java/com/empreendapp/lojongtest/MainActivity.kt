@@ -1,40 +1,30 @@
 package com.empreendapp.lojongtest
 
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
-import androidx.annotation.RequiresApi
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.empreendapp.lojongtest.adapter.StepAdapter
 import com.empreendapp.lojongtest.api.ApiInterface
 import com.empreendapp.lojongtest.api.ApiUtilities
-import com.empreendapp.lojongtest.data.db.dao.StepDao
 import com.empreendapp.lojongtest.data.db.AppDatabase
-import com.empreendapp.lojongtest.model.StepStatus
-import com.empreendapp.lojongtest.data.db.entity.StepEntity
-import com.empreendapp.lojongtest.data.db.entity.toStepEntity
+import com.empreendapp.lojongtest.data.db.dao.StepDao
 import com.empreendapp.lojongtest.data.repository.StepApiDataSource
-import com.empreendapp.lojongtest.data.repository.StepDbDataSource
 import com.empreendapp.lojongtest.model.Step
-import com.empreendapp.lojongtest.model.toStep
-import com.empreendapp.lojongtest.ui.selection.SelectionStepViewModel
 import com.empreendapp.lojongtest.viewmodel.StepViewModelFactory
 import com.empreendapp.lojongtest.viewmodel.StepsViewModel
 import java.util.*
 import kotlin.collections.ArrayList
 
+
 class MainActivity : AppCompatActivity() {
-    var rv: RecyclerView? = null
+    var gv: GridView? = null
     var db: AppDatabase? = null
     var dao: StepDao? = null
-    var adapter: StepAdapter? = null
+//    var adapter: StepAdapter? = null
     var steps: ArrayList<Step>? = null
     var stepsViewModel: StepsViewModel? = null
 
@@ -45,6 +35,32 @@ class MainActivity : AppCompatActivity() {
         initDB(savedInstanceState)
         initViews()
         initApi(savedInstanceState)
+        initScene()
+    }
+
+    private fun initScene() {
+        var puzzle = ArrayList<Int>()
+
+        puzzle.addAll(
+            arrayOf(
+                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
+                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
+                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
+                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
+                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
+                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
+                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
+                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
+                R.drawable.ic_c1, R.drawable.ic_c1
+            )
+        )
+
+        val displayWidth = applicationContext.resources.displayMetrics.widthPixels
+        val colSize = Math.round((displayWidth/6.00))
+
+        gv!!.columnWidth = colSize.toInt()
+
+        gv!!.adapter = SceneItemAdapter(this, puzzle, colSize.toInt())
     }
 
     private fun initDB(savedInstanceState: Bundle?) {
@@ -53,38 +69,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews(){
-        rv = findViewById(R.id.rv)
-        rv!!.layoutManager = LinearLayoutManager(this)
-        rv!!.itemAnimator = DefaultItemAnimator()
-
+        gv = findViewById(R.id.gv)
         steps = ArrayList()
-        adapter = StepAdapter(this, steps!!, dao!!)
-
-        findViewById<Button>(R.id.bCreate).setOnClickListener {
-            val status = StepStatus(false, 0)
-            dao!!.insert(
-                Step(
-                    (rv!!.adapter!!.itemCount + 1).toLong(),
-                    findViewById<EditText>(R.id.editStepText).text.toString()
-                            + (rv!!.adapter!!.itemCount + 1).toString(),
-                    0,
-                    "",
-                    Date(),
-                    "",
-                    Date(),
-                    false,
-                    false,
-                    status
-                ).toStepEntity()
-            )
-
-            dao!!.findAll().forEach { stepEntity ->
-                steps!!.add(stepEntity.toStep())
-            }
-
-            adapter = StepAdapter(this, steps!!, dao!!)
-            rv!!.adapter = adapter
-        }
     }
 
     private fun initApi(savedInstanceState: Bundle?){
@@ -96,7 +82,26 @@ class MainActivity : AppCompatActivity() {
 
         stepsViewModel!!.steps.observe(this) {
             steps = it as ArrayList<Step>?
-            rv!!.adapter = StepAdapter(this, steps!!, dao!!)
+            //rv!!.adapter = StepAdapter(this, steps!!, dao!!)
+        }
+    }
+
+    class SceneItemAdapter(context: Context, itens: ArrayList<Int>, val colWidth: Int) :
+        ArrayAdapter<Int>(context, 0, itens) {
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            var viewItem = convertView
+
+            if (viewItem == null) {
+                viewItem = LayoutInflater.from(context).inflate(R.layout.single_image, parent, false)
+            }
+
+            val res = getItem(position)
+            val img: ImageView = viewItem!!.findViewById(R.id.img)
+            img.setImageResource(res!!)
+            img.layoutParams.height = colWidth
+
+            return viewItem
         }
     }
 }
