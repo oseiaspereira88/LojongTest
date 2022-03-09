@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.empreendapp.lojongtest.adapter.SceneItemAdapter
 import com.empreendapp.lojongtest.api.ApiInterface
 import com.empreendapp.lojongtest.api.ApiUtilities
 import com.empreendapp.lojongtest.data.db.AppDatabase
@@ -16,17 +17,15 @@ import com.empreendapp.lojongtest.data.repository.StepApiDataSource
 import com.empreendapp.lojongtest.model.Step
 import com.empreendapp.lojongtest.viewmodel.StepViewModelFactory
 import com.empreendapp.lojongtest.viewmodel.StepsViewModel
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
     var gv: GridView? = null
     var db: AppDatabase? = null
     var dao: StepDao? = null
-//    var adapter: StepAdapter? = null
     var steps: ArrayList<Step>? = null
     var stepsViewModel: StepsViewModel? = null
+    var scrollView: ScrollView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,28 +38,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initScene() {
+        val colSize = getColSize()
+        gv!!.columnWidth = colSize
+        gv!!.layoutParams.height = (15*colSize)
+        scrollView!!.postDelayed({ scrollView!!.fullScroll(ScrollView.FOCUS_DOWN) }, 1600)
+    }
+
+    private fun getColSize(): Int{
+        val displayWidth = applicationContext.resources.displayMetrics.widthPixels
+        return Math.round((displayWidth/4.00)).toInt()
+    }
+
+    private fun getResList(): ArrayList<Int> {
         var puzzle = ArrayList<Int>()
 
         puzzle.addAll(
             arrayOf(
-                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
-                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
-                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
-                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
-                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
-                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
-                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
-                R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1, R.drawable.ic_c2, R.drawable.ic_c1,
-                R.drawable.ic_c1, R.drawable.ic_c1
+                R.drawable.grass, R.drawable.rv,    R.drawable.grass, R.raw.arvore,
+                R.drawable.grass, R.drawable.c4,    R.drawable.c2,    R.drawable.grass,
+                R.drawable.grass, R.raw.arvore,     R.drawable.rv,    R.drawable.grass,
+                R.drawable.c1,    R.drawable.rh,    R.drawable.c3,    R.drawable.grass,
+                R.drawable.steph, R.drawable.grass, R.raw.arvore,     R.raw.arvore,
+                R.drawable.c4,    R.drawable.c2,    R.raw.arvore,     R.raw.arvore,
+                R.drawable.grass, R.drawable.steph, R.drawable.grass, R.drawable.grass,
+                R.raw.arvore,     R.drawable.rv,    R.drawable.grass, R.drawable.grass,
+                R.drawable.grass, R.drawable.c4,    R.drawable.stepv, R.drawable.c2,
+                R.drawable.grass, R.drawable.grass, R.raw.arvore,     R.drawable.rv,
+                R.drawable.grass, R.drawable.c1,    R.drawable.rh,    R.drawable.c3,
+                R.drawable.grass, R.drawable.steph, R.drawable.grass, R.raw.arvore,
+                R.drawable.grass, R.drawable.c4,    R.drawable.c2,    R.raw.arvore,
+                R.drawable.grass, R.drawable.grass, R.drawable.steph, R.drawable.grass,
+                R.raw.arvore,     R.drawable.grass, R.drawable.rv,    R.drawable.grass,
             )
         )
 
-        val displayWidth = applicationContext.resources.displayMetrics.widthPixels
-        val colSize = Math.round((displayWidth/6.00))
+        return puzzle
+    }
 
-        gv!!.columnWidth = colSize.toInt()
-
-        gv!!.adapter = SceneItemAdapter(this, puzzle, colSize.toInt())
+    private fun setSceneItemAdapter(resList: ArrayList<Int>, steps: ArrayList<Step>, colSize: Int){
+        gv!!.adapter = SceneItemAdapter(this, resList, steps, colSize)
     }
 
     private fun initDB(savedInstanceState: Bundle?) {
@@ -70,6 +86,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initViews(){
         gv = findViewById(R.id.gv)
+        scrollView = findViewById(R.id.sv)
         steps = ArrayList()
     }
 
@@ -82,26 +99,7 @@ class MainActivity : AppCompatActivity() {
 
         stepsViewModel!!.steps.observe(this) {
             steps = it as ArrayList<Step>?
-            //rv!!.adapter = StepAdapter(this, steps!!, dao!!)
-        }
-    }
-
-    class SceneItemAdapter(context: Context, itens: ArrayList<Int>, val colWidth: Int) :
-        ArrayAdapter<Int>(context, 0, itens) {
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            var viewItem = convertView
-
-            if (viewItem == null) {
-                viewItem = LayoutInflater.from(context).inflate(R.layout.single_image, parent, false)
-            }
-
-            val res = getItem(position)
-            val img: ImageView = viewItem!!.findViewById(R.id.img)
-            img.setImageResource(res!!)
-            img.layoutParams.height = colWidth
-
-            return viewItem
+            steps?.let { steps -> setSceneItemAdapter(getResList(), steps, getColSize()) }
         }
     }
 }
