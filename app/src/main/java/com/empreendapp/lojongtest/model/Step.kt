@@ -13,7 +13,7 @@ data class Step(
     internal val createdAt: Date,
     internal val deleted: Boolean,
     internal val used: Boolean,
-    internal val stepStatus: StepStatus
+    internal val stepStatus: StepStatus?
 )
 
 fun StepEntity.toStep(): Step {

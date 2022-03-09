@@ -28,7 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     ctx.applicationContext,
                     AppDatabase::class.java,
-                    "app_database"
+                    "app0_db"
                 )
                     .allowMainThreadQueries()
                     .fallbackToDestructiveMigration()

@@ -20,8 +20,10 @@ data class StepEntity(
     var createdAt: Date,
     var deleted: Boolean,
     var used: Boolean,
-    var stepStatus: StepStatus
-)
+    var stepStatus: StepStatus?
+) {
+    fun isExpired(): Boolean = (Date().time - createdAt.time < (86400 * 1000))
+}
 
 fun StepViewParams.toStepEntity(): StepEntity {
     return StepEntity(

@@ -22,10 +22,10 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromJson(value: String): StepStatus =
-        Gson().fromJson(value, object : TypeToken<StepStatus>() {}.type)
+    fun fromJson(value: String): StepStatus? =
+        Gson().fromJson(value, object : TypeToken<StepStatus?>() {}.type)
 
     @TypeConverter
-    fun statusToJson(stepStatus: StepStatus): String = Gson().toJson(stepStatus)
+    fun statusToJson(stepStatus: StepStatus?): String = Gson().toJson(stepStatus)
 
 }
