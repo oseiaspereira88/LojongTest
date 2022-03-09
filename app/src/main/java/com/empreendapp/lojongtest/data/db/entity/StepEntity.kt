@@ -20,9 +20,15 @@ data class StepEntity(
     var createdAt: Date,
     var deleted: Boolean,
     var used: Boolean,
-    var stepStatus: StepStatus?
+    var stepStatus: StepStatus?,
+    var insertedAt: Date?
 ) {
-    fun isExpired(): Boolean = (Date().time - createdAt.time < (86400 * 1000))
+    fun isExpired(): Boolean {
+        insertedAt?.let {
+            return (Date().time - insertedAt!!.time < (86400 * 1000))
+        }
+        return true
+    }
 }
 
 fun StepViewParams.toStepEntity(): StepEntity {
@@ -36,7 +42,8 @@ fun StepViewParams.toStepEntity(): StepEntity {
         createdAt = this.createdAt,
         deleted = this.deleted,
         used = this.used,
-        stepStatus = this.stepStatus
+        stepStatus = this.stepStatus,
+        insertedAt = Date()
     )
 }
 
@@ -51,6 +58,7 @@ fun Step.toStepEntity(): StepEntity {
         createdAt = this.createdAt,
         deleted = this.deleted,
         used = this.used,
-        stepStatus = this.stepStatus
+        stepStatus = this.stepStatus,
+        insertedAt = Date()
     )
 }
