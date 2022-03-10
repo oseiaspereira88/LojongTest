@@ -1,22 +1,25 @@
 package com.empreendapp.lojongtest.adapter
 
-import android.content.Context
+import android.app.Activity
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.airbnb.lottie.LottieAnimationView
 import com.empreendapp.lojongtest.R
 import com.empreendapp.lojongtest.model.Step
 
-class SceneItemAdapter(context: Context, itens: ArrayList<Int>, val steps: ArrayList<Step>, val colWidth: Int) :
-    ArrayAdapter<Int>(context, 0, itens) {
+
+class SceneItemAdapter(val act: Activity, itens: ArrayList<Int>, val steps: ArrayList<Step>, val colWidth: Int) :
+    ArrayAdapter<Int>(act, 0, itens) {
     var index: Int = 0
 
     var stepViewSelected: LottieAnimationView? = null
+    var dialogView: View? = null
+    var cardDialog: CardView? = null
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var viewItem = convertView
@@ -63,7 +66,39 @@ class SceneItemAdapter(context: Context, itens: ArrayList<Int>, val steps: Array
                     animView.playAnimation()
                     stepViewSelected = animView
 
-                    Toast.makeText(context, step!!.text, Toast.LENGTH_LONG).show()
+                    if(dialogView == null){
+                        dialogView = act.layoutInflater
+                            .inflate(R.layout.step_dialog,
+                                (viewItem.parent.parent as ConstraintLayout)
+                                    .findViewById<ConstraintLayout>(R.id.clDialog))
+
+                        cardDialog = dialogView!!.findViewById(R.id.cardDialog)
+                        cardDialog!!.layoutParams.width = (colWidth * 1.5).toInt()
+                    }
+
+                    val tvAlert = dialogView!!.findViewById<TextView>(R.id.tvAlert)
+                    tvAlert.setText(step!!.text)
+
+                    cardDialog!!.visibility = View.INVISIBLE
+
+                    val r = Runnable{
+                        cardDialog!!.visibility = View.VISIBLE
+
+                        cardDialog!!.x = viewItem.x - (colWidth * 0.25).toInt()
+                        cardDialog!!.y = viewItem.y + (cardDialog!!.top - cardDialog!!.bottom)
+
+                        if(cardDialog!!.x < 0f){
+                            cardDialog!!.x += (colWidth * 0.5).toInt()
+                        }
+                    }
+
+                    Handler().postDelayed(r, 200)
+
+                    val bOkay = dialogView!!.findViewById<Button>(R.id.bOkay)
+                    bOkay.setOnClickListener {
+                        cardDialog!!.visibility = View.INVISIBLE
+                    }
+
                 }
 
                 if((steps.size - index) == 0){
@@ -80,6 +115,18 @@ class SceneItemAdapter(context: Context, itens: ArrayList<Int>, val steps: Array
         }
 
         return viewItem
+    }
+
+    private fun getRelativeLeft(myView: View): Int {
+        return if (myView.parent === myView.rootView) myView.left else myView.left + getRelativeLeft(
+            myView.parent as View
+        )
+    }
+
+    private fun getRelativeTop(myView: View): Int {
+        return if (myView.parent === myView.rootView) myView.top else myView.top + getRelativeTop(
+            myView.parent as View
+        )
     }
 }
 

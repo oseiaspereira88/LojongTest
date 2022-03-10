@@ -25,7 +25,7 @@ data class StepEntity(
 ) {
     fun isExpired(): Boolean {
         insertedAt?.let {
-            return (Date().time - insertedAt!!.time < (86400 * 1000))
+            return (Date().time - insertedAt!!.time > (86400 * 1000))
         }
         return true
     }

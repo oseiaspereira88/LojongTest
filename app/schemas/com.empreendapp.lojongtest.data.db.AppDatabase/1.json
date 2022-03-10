@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "67a0a444dd7786c57f9a97fbd016c565",
+    "identityHash": "08befd1062977525b8e4dfef648ae60c",
     "entities": [
       {
         "tableName": "StepEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `text` TEXT NOT NULL, `v` INTEGER NOT NULL, `source` TEXT NOT NULL, `updatedAt` INTEGER NOT NULL, `type` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `deleted` INTEGER NOT NULL, `used` INTEGER NOT NULL, `stepStatus` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `text` TEXT NOT NULL, `v` INTEGER NOT NULL, `source` TEXT NOT NULL, `updatedAt` INTEGER NOT NULL, `type` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `deleted` INTEGER NOT NULL, `used` INTEGER NOT NULL, `stepStatus` TEXT, `insertedAt` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -67,6 +67,12 @@
             "columnName": "stepStatus",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "insertedAt",
+            "columnName": "insertedAt",
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -92,7 +98,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '67a0a444dd7786c57f9a97fbd016c565')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '08befd1062977525b8e4dfef648ae60c')"
     ]
   }
 }

@@ -28,10 +28,10 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     ctx.applicationContext,
                     AppDatabase::class.java,
-                    "app002_db"
+                    "app1_db"
                 )
                     .allowMainThreadQueries()
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigrationOnDowngrade()
                     .build()
                 INSTANCE = instance
                 return instance
